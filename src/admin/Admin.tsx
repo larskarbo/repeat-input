@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, } from 'react-native';
-import Text from '../stock/Text';
-import { buckets } from '../AllBuckets';
+import Text from '../components/Text';
+import { boxes } from '../AllBoxes';
 import { getBucketContents } from '../server/api';
-
+import Table from 'rc-table';
+import moment from "moment"
+import './tablestyles.css'
 
 export default function () {
 
@@ -14,10 +16,9 @@ export default function () {
       backgroundColor: "white",
       padding: 20,
     }}>
-      <Text>Admin panel</Text>
-      {buckets.map(b => (
-        <Bucket key={b.id} bucket={b}>
-        </Bucket>
+      <Text>🗃 Inputboxes:</Text>
+      {boxes.map(b => (
+        <Bucket key={b.id} bucket={b} />
       ))}
     </View>
   );
@@ -32,39 +33,44 @@ const Bucket = ({ bucket }) => {
     console.log('bucket.id: ', bucket.id);
     getBucketContents(bucket.id).then(a => {
       console.log('a: ', a);
-      setAnswers(a)
+      setAnswers(a.map(a => {
+        return {
+          ...a.data.answers,
+          created: a.data.created,
+          key: a.ref.value.id
+        }
+      }))
     })
   }, [bucket.id])
 
-  return (
-    <View key={bucket.id}>
-      <Text>{bucket.name}</Text>
-      <View>
-        <Row columns={["created", ...bucket.questions.map(q => q.name)]} />
-        {answers.map(a => {
-          console.log(a.data.answers)
-          const values = Object.keys(a.data.answers).map(function (key) {
-            return a.data.answers[key];
-          });
-          return (
-            <Row key={a.ts} columns={values} />
+  const columns = [
+    {
+      title: 'Created at',
+      dataIndex: 'created',
+      key: 'created',
+      width: 100,
+      render: (asdf) => moment(asdf).fromNow(), //format("MMM Do hh:mm"),
+    },
+    ...bucket.questions.map(q => ({
+      title: q.name,
+      width: 200,
+      key: q.name,
+      dataIndex: q.name
+    }))
+  ];
 
-          )
-        })}
+  return (
+    <View style={{
+      marginVertical: 10
+    }}>
+      <Text style={{
+        fontSize: 12,
+        fontWeight: "bold",
+        paddingBottom: 8
+      }}>{bucket.name}</Text>
+      <View>
+        <Table columns={columns} data={answers} />
       </View>
     </View>
   )
 }
-
-const Row = ({ columns }) => (
-  <View style={{
-    flexDirection: "row"
-  }}>
-
-    {columns.map((c, i) => (
-      <View key={i}>
-        <Text>{c}</Text>
-      </View>
-    ))}
-  </View>
-)

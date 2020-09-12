@@ -1,20 +1,20 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import AllBuckets from "./src/AllBuckets"
+import AllBoxes from "./src/AllBoxes"
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import InputView from './src/InputView';
-import Text from './src/stock/Text';
+import Text from './src/components/Text';
 import Admin from './src/admin/Admin';
 
 const linking = {
   prefixes: ['http://localhost:19006', 'mychat://'],
   config: {
     screens: {
-      Home: 'buckets',
-      Bucket: 'buckets/:bucket',
+      Home: 'boxes',
+      Box: 'boxes/:box',
       Admin: 'admin',
       404: '*',
     },
@@ -28,11 +28,11 @@ export default function App() {
     <View style={styles.container}>
 
       <NavigationContainer linking={linking}>
-        <Stack.Navigator>
-          <Stack.Screen name="Home" component={AllBuckets} />
-          <Stack.Screen name="Bucket" component={InputView} />
+        <Stack.Navigator screenOptions={{headerShown:false}}>
+          <Stack.Screen name="Home" component={AllBoxes} />
+          <Stack.Screen name="Box" component={InputView} />
           <Stack.Screen name="404" component={NotFound} />
-          <Stack.Screen options={{headerShown:false}} name="Admin" component={Admin} />
+          <Stack.Screen name="Admin" component={Admin} />
         </Stack.Navigator>
       </NavigationContainer>
 
