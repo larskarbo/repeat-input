@@ -18,13 +18,13 @@ export default function () {
     }}>
       <Text>🗃 Inputboxes:</Text>
       {boxes.map(b => (
-        <Bucket key={b.id} bucket={b} />
+        <BucketTable key={b.id} bucket={b} />
       ))}
     </View>
   );
 }
 
-const Bucket = ({ bucket }) => {
+export const BucketTable = ({ bucket }) => {
   const [answers, setAnswers] = useState([])
 
 
@@ -33,13 +33,15 @@ const Bucket = ({ bucket }) => {
     console.log('bucket.id: ', bucket.id);
     getBucketContents(bucket.id).then(a => {
       console.log('a: ', a);
-      setAnswers(a.map(a => {
+      setAnswers(
+        a.map(a => {
         return {
           ...a.data.answers,
-          created: a.data.created,
+          created: moment(a.data.created),
           key: a.ref.value.id
         }
-      }))
+      }).sort((a,b) => b.created.diff(a.created))
+      )
     })
   }, [bucket.id])
 
@@ -49,7 +51,7 @@ const Bucket = ({ bucket }) => {
       dataIndex: 'created',
       key: 'created',
       width: 100,
-      render: (asdf) => moment(asdf).fromNow(), //format("MMM Do hh:mm"),
+      render: (asdf) => asdf.fromNow(), //format("MMM Do hh:mm"),
     },
     ...bucket.questions.map(q => ({
       title: q.name,
